@@ -1,0 +1,88 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, serif;
+  background: linear-gradient(135deg, #fff, #fff);
+  overflow: hidden;
+}
+
+.book-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.book {
+  position: relative;
+  width: 93vw;
+  max-width: 840px;
+  height: 590px;
+  perspective: 2300px;
+  transform-style: preserve-3d;
+}
+
+.paper {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform var(--dur, 900ms) ease;
+}
+
+.side {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  background: #fff;
+  border: 1px solid #d0d0d0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.front { left: 50%; transform-origin: left center; }
+.back { right: 50%; transform-origin: right center; transform: rotateY(180deg); }
+
+.paper.flipped { transform: rotateY(-180deg); }
+.side.back.hidden { visibility: hidden; }
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+button {
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #04376B;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:active { transform: translateY(1px); }
+
+/* 🌟 Tambahan styling upload */
+#pdf-upload {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f7f7f7;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Responsif */
+@media (max-width: 600px) {
+  .book { height: 380px; }
+  .content { padding: 18px; font-size: 0.95rem; }
+  .buttons { flex-direction: column; }
+}
