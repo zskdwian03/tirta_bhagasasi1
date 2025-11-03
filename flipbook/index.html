@@ -1,81 +1,206 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Flipbook</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    .book-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
 
-    .buttons {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
+    <meta charset="utf-8" />
 
-    input[type="text"] {
-      padding: 8px 12px;
-      font-size: 14px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      width: 200px;
-      transition: 0.3s;
-    }
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Flipbook</title>
 
-    input[type="text"]:focus {
-      border-color: #04376B;
-      outline: none;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
-    }
 
-    button {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #04376B;
-      color: white;
-      font-size: 14px;
-      transition: 0.3s;
-    }
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .book-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
 
-    button:hover {
-      background: #04376B;
-    }
+        .buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
 
-    .text-highlight {
-  position: absolute;
-  background: rgba(255, 200, 0, 0.45);
-  border-radius: 3px;
-  pointer-events: none;
-}
+        input[type="text"] {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            width: 200px;
+            transition: 0.3s;
+        }
 
-  </style>
+        input[type="text"]:focus {
+            border-color: #04376B;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #04376B;
+            color: white;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #04376B;
+        }
+
+        /* === CSS PERBAIKAN HIGHLIGHT === */
+        .content {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            /* BARU: Pusatkan canvas & text layer */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content>canvas,
+        .textLayer {
+            position: absolute;
+            /* HAPUS: object-fit: contain; (diganti di JS) */
+        }
+
+        .textLayer {
+            opacity: 1;
+            line-height: 1.0;
+            overflow: hidden;
+        }
+
+        .textLayer>span {
+            position: absolute;
+            color: transparent;
+            white-space: pre;
+            cursor: text;
+            transform-origin: 0% 0%;
+        }
+
+        .textLayer>span mark.highlight-match {
+            /* Teks HTML di dalamnya tetap transparan (karena mewarisi dari span) */
+            /* Kita hanya menambahkan background "stabilo" */
+            background-color: rgba(255, 200, 0, 0.45);
+        }
+
+
+        /* CSS PANEL HASIL PENCARIAN */
+        #search-results-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 300px;
+            max-height: calc(100vh - 180px);
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        #search-results-header {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #search-results-header h4 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        #search-results-count {
+            font-size: 14px;
+            color: #555;
+        }
+
+        #search-results-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        #search-results-list li {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #search-results-list li:hover {
+            background-color: #f0f0f0;
+        }
+
+        #search-results-list li strong {
+            display: block;
+            font-size: 14px;
+            color: #04376B;
+            margin-bottom: 5px;
+        }
+
+        #search-results-list li p {
+            font-size: 12px;
+            color: #333;
+            margin: 0;
+            line-height: 1.4;
+            max-height: 4.2em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #search-results-list li mark {
+            background-color: #ffc800;
+            color: #333;
+            font-weight: bold;
+            padding: 0 1px;
+        }
+    </style>
 </head>
+
 <body>
+    <div class="book-container">
 
-  <div class="book-container">
-    <div class="book" id="book"></div>
-    <div class="buttons">
-      <button id="prev-btn">← Sebelumnya</button>
-      <button id="next-btn">Berikutnya →</button>
+        <div id="search-results-panel">
+            <div id="search-results-header">
+                <h4>Hasil Pencarian</h4>
+                <span id="search-results-count"></span>
+            </div>
+            <ul id="search-results-list">
+            </ul>
+        </div>
 
-      <!-- 🔍 Search bar -->
-      <input type="text" id="search-input" placeholder="Search">
-      <button id="search-btn">Cari</button>
+        <div class="book" id="book"></div>
+        <div class="buttons">
+            <button id="prev-btn">← Sebelumnya</button>
+            <button id="next-btn">Berikutnya →</button>
+
+            <input type="text" id="search-input" placeholder="Search">
+            <button id="search-btn">Cari</button>
+        </div>
     </div>
-  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script src="script.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+    <script src="script.js"></script>
 </body>
+
 </html>

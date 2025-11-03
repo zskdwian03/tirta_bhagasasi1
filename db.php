@@ -2,7 +2,7 @@
 class Database {
     private $host = "127.0.0.1";      // tidak perlu menulis :3306, default port MySQL sudah 3306
     private $port = "3306";           // tambahkan properti port agar lebih fleksibel
-    private $db_name = "db_flipbook"; // ganti sesuai nama database kamu
+    private $db_name = "d_flipbook"; // ganti sesuai nama database kamu
     private $username = "root"; 
     private $password = ""; 
     private $conn;
